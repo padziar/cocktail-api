@@ -9,17 +9,51 @@ REST API do zarządzania koktajlami i ich składnikami, zbudowane w Django i Dja
 - Paginacja (10 elementów na stronę, `?page=N`)
 - Walidacja danych wejściowych (nazwy, niepowtarzające się składniki, dodatnie ilości)
 - Filtrowanie, wyszukiwanie i sortowanie (django-filter)
+- Dokumentacja OpenAPI/Swagger: http://127.0.0.1:8000/api/docs/
 - Testy automatyczne (`APITestCase`)
-- Baza danych: domyślnie SQLite, PostgreSQL przez zmienną `DATABASE_URL`
-- Dokumentacja OpenAPI/Swagger: 
+- Docker + PostgreSQL (lokalnie bez Dockera: SQLite)
 
-## Uruchomienie (Windows PowerShell)
+## Schemat bazy danych
+
+![Schemat bazy danych](docs/db-schema.png)
+
+- `Ingredient` i `Cocktail` połączone relacją wiele-do-wielu przez tabelę `CocktailIngredient` (przechowuje ilość i jednostkę).
+- Ten sam składnik nie może wystąpić dwa razy w jednym koktajlu (unikalna para `cocktail`, `ingredient`).
+- Usunięcie koktajlu usuwa jego pozycje; składnika użytego w koktajlu nie da się usunąć (`409 Conflict`).
+
+## Uruchomienie w Dockerze (zalecane, PostgreSQL)
+
+Wymagany Docker Desktop.
+
+```powershell
+docker compose up --build
+```
+
+W drugim oknie terminala utwórz konto administratora:
+
+```powershell
+docker compose exec web python manage.py createsuperuser
+```
+
+- API: http://localhost:8000/api/
+- Swagger: http://localhost:8000/api/docs/
+- Panel admina: http://localhost:8000/admin/
+
+Testy w kontenerze:
+
+```powershell
+docker compose exec web python manage.py test
+```
+
+Zatrzymanie: `docker compose down` (dane zostają), z usunięciem danych bazy: `docker compose down -v`.
+
+## Uruchomienie lokalne (Windows PowerShell, SQLite)
 
 Wymagany Python 3.12 (lub 3.10+).
 
 ```powershell
 py -3.12 -m venv .venv
-.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 copy .env.example .env
 python manage.py migrate
@@ -27,18 +61,11 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-Korzeń API: http://127.0.0.1:8000/api/
-Panel admina: http://127.0.0.1:8000/admin/
-
-### PostgreSQL (opcjonalnie)
-
-Utwórz bazę danych i ustaw w pliku `.env`:
+Aby użyć lokalnie PostgreSQL, ustaw w `.env`:
 
 ```
 DATABASE_URL=postgres://USER:PASSWORD@localhost:5432/cocktails
 ```
-
-Następnie ponownie uruchom `python manage.py migrate`.
 
 ## Endpointy
 
@@ -48,8 +75,6 @@ Następnie ponownie uruchom `python manage.py migrate`.
 | GET, PUT, PATCH, DELETE | `/api/ingredients/{id}/` | szczegóły, edycja, usuwanie |
 | GET, POST | `/api/cocktails/` | lista (z paginacją), tworzenie |
 | GET, PUT, PATCH, DELETE | `/api/cocktails/{id}/` | szczegóły, edycja, usuwanie |
-
-Próba usunięcia składnika użytego w koktajlu zwraca `409 Conflict`.
 
 ### Przykład: utworzenie koktajlu
 
@@ -85,6 +110,5 @@ python manage.py test
 
 ## Możliwe usprawnienia
 
-- Dokumentacja OpenAPI/Swagger (drf-spectacular)
 - Użytkownicy, autoryzacja JWT, uprawnienia, autor koktajlu i recenzje
-- Diagram schematu bazy danych
+- Ścisła walidacja wartości logicznych w filtrach
