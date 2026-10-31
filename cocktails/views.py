@@ -4,12 +4,13 @@ from rest_framework.response import Response
 
 from .models import Cocktail, Ingredient
 from .serializers import CocktailSerializer, IngredientSerializer
+from .filters import CocktailFilter, IngredientFilter
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filterset_fields = ["is_alcoholic"]
+    filterset_class = IngredientFilter
     search_fields = ["name", "description"]
     ordering_fields = ["name", "id"]
 
@@ -28,6 +29,6 @@ class CocktailViewSet(viewsets.ModelViewSet):
         "cocktail_ingredients__ingredient"
     )
     serializer_class = CocktailSerializer
-    filterset_fields = ["category"]
+    filterset_class = CocktailFilter
     search_fields = ["name", "category", "ingredients__name"]
     ordering_fields = ["name", "category", "created_at"]
