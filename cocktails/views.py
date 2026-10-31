@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from .models import Cocktail, Ingredient
 from .serializers import CocktailSerializer, IngredientSerializer
 from .filters import CocktailFilter, IngredientFilter
+from drf_spectacular.utils import extend_schema
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
@@ -13,6 +14,17 @@ class IngredientViewSet(viewsets.ModelViewSet):
     filterset_class = IngredientFilter
     search_fields = ["name", "description"]
     ordering_fields = ["name", "id"]
+    
+    @extend_schema(
+        responses={
+            204: None,
+            409: {
+                "type": "object",
+                "properties": {"detail": {"type": "string"}},
+            },
+        }
+    )
+    
 
     def destroy(self, request, *args, **kwargs):
         try:

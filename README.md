@@ -11,6 +11,7 @@ REST API do zarządzania koktajlami i ich składnikami, zbudowane w Django i Dja
 - Filtrowanie, wyszukiwanie i sortowanie (django-filter)
 - Testy automatyczne (`APITestCase`)
 - Baza danych: domyślnie SQLite, PostgreSQL przez zmienną `DATABASE_URL`
+- Dokumentacja OpenAPI/Swagger: 
 
 ## Uruchomienie (Windows PowerShell)
 

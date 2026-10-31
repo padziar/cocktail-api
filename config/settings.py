@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "cocktails",
+    "drf_spectacular"
 ]
 
 MIDDLEWARE = [
@@ -130,4 +131,12 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Cocktail API",
+    "DESCRIPTION": "REST API for managing cocktails and ingredients",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
