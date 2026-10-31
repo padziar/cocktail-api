@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: cocktails
+      POSTGRES_USER: cocktails
+      POSTGRES_PASSWORD: cocktails
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cocktails -d cocktails"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      SECRET_KEY: change-me-in-production
+      DEBUG: "True"
+      ALLOWED_HOSTS: localhost,127.0.0.1
+      DATABASE_URL: postgres://cocktails:cocktails@db:5432/cocktails
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
